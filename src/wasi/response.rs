@@ -49,25 +49,6 @@ impl Response {
     }
 
     /// Get the `StatusCode` of this `Response`.
-    ///
-    /// # Examples
-    ///
-    /// Checking for general status class:
-    ///
-    /// ```rust
-    /// # #[cfg(feature = "json")]
-    /// # fn run() -> Result<(), Box<std::error::Error>> {
-    /// let resp = reqwest::blocking::get("http://httpbin.org/get")?;
-    /// if resp.status().is_success() {
-    ///     println!("success!");
-    /// } else if resp.status().is_server_error() {
-    ///     println!("server error!");
-    /// } else {
-    ///     println!("Something else happened. Status: {:?}", resp.status());
-    /// }
-    /// # Ok(())
-    /// # }
-    /// ```
     #[inline]
     pub fn status(&self) -> StatusCode {
         self.status
@@ -297,10 +278,7 @@ impl Response {
     /// On success, the total number of bytes that were copied to `writer` is returned.
     ///
     /// [`std::io::copy`]: https://doc.rust-lang.org/std/io/fn.copy.html
-    pub fn copy_to<W: ?Sized>(&mut self, w: &mut W) -> crate::Result<u64>
-    where
-        W: io::Write,
-    {
+    pub fn copy_to<W: io::Write + ?Sized>(&mut self, w: &mut W) -> crate::Result<u64> {
         io::copy(self, w).map_err(crate::error::decode_io)
     }
 

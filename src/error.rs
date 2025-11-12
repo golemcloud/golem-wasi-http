@@ -40,22 +40,6 @@ impl Error {
     }
 
     /// Returns a possible URL related to this error.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # async fn run() {
-    /// // displays last stop of a redirect loop
-    /// let response = reqwest::get("http://site.with.redirect.loop").await;
-    /// if let Err(e) = response {
-    ///     if e.is_redirect() {
-    ///         if let Some(final_stop) = e.url() {
-    ///             println!("redirect loop at {final_stop}");
-    ///         }
-    ///     }
-    /// }
-    /// # }
-    /// ```
     pub fn url(&self) -> Option<&Url> {
         self.inner.url.as_ref()
     }
@@ -143,13 +127,13 @@ impl Error {
 
     #[allow(unused)]
     pub(crate) fn into_io(self) -> io::Error {
-        io::Error::new(io::ErrorKind::Other, self)
+        io::Error::other(self)
     }
 }
 
 impl fmt::Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut builder = f.debug_struct("reqwest::Error");
+        let mut builder = f.debug_struct("golem_wasi_http::Error");
 
         builder.field("kind", &self.inner.kind);
 
@@ -331,7 +315,7 @@ mod tests {
 
     #[test]
     fn from_unknown_io_error() {
-        let orig = io::Error::new(io::ErrorKind::Other, "orly");
+        let orig = io::Error::other("orly");
         let err = super::decode_io(orig);
         match err.inner.kind {
             Kind::Decode => (),
@@ -344,7 +328,7 @@ mod tests {
         let err = super::request(super::TimedOut);
         assert!(err.is_timeout());
 
-        let io = io::Error::new(io::ErrorKind::Other, err);
+        let io = io::Error::other(err);
         let nested = super::request(io);
         assert!(nested.is_timeout());
     }

@@ -1,39 +1,8 @@
 //! multipart/form-data
 //!
-//! To send a `multipart/form-data` body, a [`Form`](crate::blocking::multipart::Form) is built up, adding
-//! fields or customized [`Part`](crate::blocking::multipart::Part)s, and then calling the
+//! To send a `multipart/form-data` body, a [`Form`](crate::multipart::Form) is built up, adding
+//! fields or customized [`Part`](crate::multipart::Part)s, and then calling the
 //! [`multipart`][builder] method on the `RequestBuilder`.
-//!
-//! # Example
-//!
-//! ```
-//! use reqwest::blocking::multipart;
-//!
-//! # fn run() -> Result<(), Box<dyn std::error::Error>> {
-//! let form = multipart::Form::new()
-//!     // Adding just a simple text field...
-//!     .text("username", "seanmonstar")
-//!     // And a file...
-//!     .file("photo", "/path/to/photo.png")?;
-//!
-//! // Customize all the details of a Part if needed...
-//! let bio = multipart::Part::text("hallo peeps")
-//!     .file_name("bio.txt")
-//!     .mime_str("text/plain")?;
-//!
-//! // Add the custom part to our form...
-//! let form = form.part("biography", bio);
-//!
-//! // And finally, send the form
-//! let client = reqwest::blocking::Client::new();
-//! let resp = client
-//!     .post("http://localhost:8080/user")
-//!     .multipart(form)
-//!     .send()?;
-//! # Ok(())
-//! # }
-//! # fn main() {}
-//! ```
 //!
 //! [builder]: ../struct.RequestBuilder.html#method.multipart
 use std::borrow::Cow;
@@ -98,14 +67,6 @@ impl Form {
     }
 
     /// Add a data field with supplied name and value.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// let form = reqwest::blocking::multipart::Form::new()
-    ///     .text("username", "seanmonstar")
-    ///     .text("password", "secret");
-    /// ```
     pub fn text<T, U>(self, name: T, value: U) -> Form
     where
         T: Into<Cow<'static, str>>,
@@ -117,16 +78,6 @@ impl Form {
     /// Adds a file field.
     ///
     /// The path will be used to try to guess the filename and mime.
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # fn run() -> std::io::Result<()> {
-    /// let files = reqwest::blocking::multipart::Form::new()
-    ///     .file("key", "/path/to/file")?;
-    /// # Ok(())
-    /// # }
-    /// ```
     ///
     /// # Errors
     ///
@@ -578,7 +529,6 @@ impl PercentEncoding {
         }
 
         // According to RFC7578 Section 4.2, `filename*=` syntax is invalid.
-        // See https://github.com/seanmonstar/reqwest/issues/419.
         if let Some(filename) = &field.file_name {
             buf.extend_from_slice(b"; filename=\"");
             let legal_filename = filename

@@ -53,29 +53,6 @@ impl Body {
     /// encountering a 307 or 308 status code, instead of repeating the
     /// request at the new location, the `Response` will be returned with
     /// the redirect status code set.
-    ///
-    /// ```rust
-    /// # use std::fs::File;
-    /// # use reqwest::Body;
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let file = File::open("national_secrets.txt")?;
-    /// let body = Body::new(file);
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// If you have a set of bytes, like `String` or `Vec<u8>`, using the
-    /// `From` implementations for `Body` will store the data in a manner
-    /// it can be reused.
-    ///
-    /// ```rust
-    /// # use reqwest::Body;
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let s = "A stringy body";
-    /// let body = Body::from(s);
-    /// # Ok(())
-    /// # }
-    /// ```
     pub fn new<R: Read + 'static>(reader: R) -> Body {
         Body {
             kind: Some(Kind::Reader(Box::from(reader), None)),
@@ -85,17 +62,6 @@ impl Body {
     /// Create a `Body` from a `Read` where the size is known in advance
     /// but the data should not be fully loaded into memory. This will
     /// set the `Content-Length` header and stream from the `Read`.
-    ///
-    /// ```rust
-    /// # use std::fs::File;
-    /// # use reqwest::Body;
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let file = File::open("a_large_file.txt")?;
-    /// let file_size = file.metadata()?.len();
-    /// let body = Body::sized(file, file_size);
-    /// # Ok(())
-    /// # }
-    /// ```
     pub fn sized<R: Read + 'static>(reader: R, len: u64) -> Body {
         Body {
             kind: Some(Kind::Reader(Box::from(reader), Some(len))),
@@ -267,7 +233,7 @@ impl Body {
 
     pub(crate) fn into_reader(mut self) -> Reader {
         match self.kind.take() {
-            Some(Kind::Reader(r, _)) => Reader::Reader(r),
+            Some(Kind::Reader(r, _)) => Reader::IoRead(r),
             Some(Kind::Bytes(b)) => Reader::Bytes(Cursor::new(b)),
             Some(Kind::Incoming {
                 stream,
@@ -475,7 +441,7 @@ impl<'a> fmt::Debug for DebugLength<'a> {
 }
 
 pub(crate) enum Reader {
-    Reader(Box<dyn Read>),
+    IoRead(Box<dyn Read>),
     Bytes(Cursor<Bytes>),
     Wasi {
         body_stream: InputStream,
@@ -493,7 +459,7 @@ impl Reader {
 impl Read for Reader {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         match self {
-            Reader::Reader(rdr) => rdr.read(buf),
+            Reader::IoRead(rdr) => rdr.read(buf),
             Reader::Bytes(rdr) => rdr.read(buf),
             Reader::Wasi { body_stream, .. } => match body_stream.blocking_read(buf.len() as u64) {
                 Ok(body_chunk) => {
@@ -503,7 +469,7 @@ impl Read for Reader {
                 }
                 Err(streams::StreamError::Closed) => Ok(0),
                 Err(streams::StreamError::LastOperationFailed(err)) => {
-                    Err(io::Error::new(io::ErrorKind::Other, err.to_debug_string()))
+                    Err(io::Error::other(err.to_debug_string()))
                 }
             },
         }
@@ -531,7 +497,7 @@ impl async_iterator::Iterator for AsyncReader {
 
         match self {
             Self::ReaderBased { reader } => match reader {
-                Reader::Reader(rdr) => {
+                Reader::IoRead(rdr) => {
                     let mut buf = vec![0; CHUNK_SIZE];
                     rdr.read(&mut buf)
                         .map(|n| {

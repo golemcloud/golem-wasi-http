@@ -1,6 +1,5 @@
 use crate::error::Kind;
 use http::Method;
-use std::io::ErrorKind;
 use wasi::http::types;
 use wasi::io::streams;
 
@@ -23,10 +22,7 @@ impl From<types::ErrorCode> for crate::Error {
     fn from(value: types::ErrorCode) -> Self {
         crate::Error::new(
             Kind::Request,
-            Some(std::io::Error::new(
-                ErrorKind::Other,
-                format!("{:?}", value),
-            )),
+            Some(std::io::Error::other(format!("{:?}", value))),
         )
     }
 }
@@ -35,10 +31,7 @@ impl From<streams::StreamError> for crate::Error {
     fn from(value: streams::StreamError) -> Self {
         crate::Error::new(
             Kind::Request,
-            Some(std::io::Error::new(
-                ErrorKind::Other,
-                format!("{:?}", value),
-            )),
+            Some(std::io::Error::other(format!("{:?}", value))),
         )
     }
 }
@@ -47,17 +40,11 @@ impl From<types::HeaderError> for crate::Error {
     fn from(value: types::HeaderError) -> Self {
         crate::Error::new(
             Kind::Request,
-            Some(std::io::Error::new(
-                ErrorKind::Other,
-                format!("{:?}", value),
-            )),
+            Some(std::io::Error::other(format!("{:?}", value))),
         )
     }
 }
 
 pub(crate) fn failure_point(s: &str, _: ()) -> crate::Error {
-    crate::Error::new(
-        Kind::Request,
-        Some(std::io::Error::new(ErrorKind::Other, s)),
-    )
+    crate::Error::new(Kind::Request, Some(std::io::Error::other(s)))
 }

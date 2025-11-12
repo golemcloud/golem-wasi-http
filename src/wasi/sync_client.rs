@@ -30,20 +30,6 @@ struct Config {
 ///
 /// The `Client` holds a connection pool internally, so it is advised that
 /// you create one and **reuse** it.
-///
-/// # Examples
-///
-/// ```rust
-/// use reqwest::blocking::Client;
-/// #
-/// # fn run() -> Result<(), reqwest::Error> {
-/// let client = Client::new();
-/// let resp = client.get("http://httpbin.org/").send()?;
-/// #   drop(resp);
-/// #   Ok(())
-/// # }
-///
-///
 #[derive(Clone, Debug)]
 pub struct Client {
     inner: Arc<ClientRef>,
@@ -57,20 +43,7 @@ struct ClientRef {
     pub between_bytes_timeout: Option<Duration>,
 }
 
-/// A `ClientBuilder` can be used to create a `Client` with  custom configuration.
-///
-/// # Example
-///
-/// ```
-/// # fn run() -> Result<(), reqwest::Error> {
-/// use std::time::Duration;
-///
-/// let client = reqwest::blocking::Client::builder()
-///     .timeout(Duration::from_secs(10))
-///     .build()?;
-/// # Ok(())
-/// # }
-/// ```
+/// A `ClientBuilder` can be used to create a `Client` with custom configuration.
 #[must_use]
 #[derive(Debug)]
 pub struct ClientBuilder {
@@ -327,6 +300,12 @@ impl Default for Client {
     }
 }
 
+impl Default for ClientBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ClientBuilder {
     /// Constructs a new `ClientBuilder`.
     ///
@@ -367,25 +346,6 @@ impl ClientBuilder {
     }
 
     /// Sets the `User-Agent` header to be used by this client.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// # fn doc() -> Result<(), reqwest::Error> {
-    /// // Name your user agent after your app?
-    /// static APP_USER_AGENT: &str = concat!(
-    ///     env!("CARGO_PKG_NAME"),
-    ///     "/",
-    ///     env!("CARGO_PKG_VERSION"),
-    /// );
-    ///
-    /// let client = reqwest::blocking::Client::builder()
-    ///     .user_agent(APP_USER_AGENT)
-    ///     .build()?;
-    /// let res = client.get("https://www.rust-lang.org").send()?;
-    /// # Ok(())
-    /// # }
-    /// ```
     pub fn user_agent<V>(mut self, value: V) -> ClientBuilder
     where
         V: TryInto<HeaderValue>,
