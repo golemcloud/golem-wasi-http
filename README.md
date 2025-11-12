@@ -1,6 +1,6 @@
 # golem-wasi-http
 
-[![crates.io](https://img.shields.io/crates/v/reqwest.svg)](https://crates.io/crates/golem-wasi-http)
+[![crates.io](https://img.shields.io/crates/v/golem-wasi-http.svg)](https://crates.io/crates/golem-wasi-http)
 [![Documentation](https://docs.rs/golem-wasi-http/badge.svg)](https://docs.rs/golem-wasi-http)
 [![Apache-2 licensed](https://img.shields.io/crates/l/golem-wasi-http.svg)](./LICENSE-APACHE)
 
