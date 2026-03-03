@@ -3,9 +3,9 @@ use bytes::Bytes;
 use std::fmt;
 use std::fs::File;
 use std::io::{self, Cursor, Read};
-use wasi::http::types::IncomingBody;
-use wasi::io::streams::InputStream;
-use wasi::io::*;
+use wasip2::http::types::IncomingBody;
+use wasip2::io::streams::InputStream;
+use wasip2::io::*;
 
 /// An asynchronous request body.
 #[derive(Debug)]

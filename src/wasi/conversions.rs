@@ -1,7 +1,7 @@
 use crate::error::Kind;
 use http::Method;
-use wasi::http::types;
-use wasi::io::streams;
+use wasip2::http::types;
+use wasip2::io::streams;
 
 pub(crate) fn encode_method(method: Method) -> types::Method {
     match method {

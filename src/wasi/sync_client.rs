@@ -10,9 +10,9 @@ use super::response::Response;
 use crate::error::Kind;
 use crate::{Body, IntoUrl};
 
-use wasi::clocks::*;
-use wasi::http::*;
-use wasi::io::*;
+use wasip2::clocks::*;
+use wasip2::http::*;
+use wasip2::io::*;
 
 #[derive(Debug)]
 struct Config {
