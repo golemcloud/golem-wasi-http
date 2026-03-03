@@ -15,11 +15,11 @@ use std::sync::Arc;
 use std::time::Duration;
 use url::Url;
 
-use wasi::clocks::*;
-use wasi::http::types::{FutureIncomingResponse, OutgoingBody, OutgoingRequest, RequestOptions};
-use wasi::http::*;
-use wasi::io::*;
-use wstd::io::AsyncPollable;
+use wasip2::clocks::*;
+use wasip2::http::types::{FutureIncomingResponse, OutgoingBody, OutgoingRequest, RequestOptions};
+use wasip2::http::*;
+use wasip2::io::*;
+use wstd::runtime::AsyncPollable;
 
 #[derive(Debug)]
 struct Config {
@@ -345,11 +345,11 @@ pub(crate) trait AsyncWriteTarget {
 
 #[derive(Debug)]
 pub(crate) struct OutputStreamWriter {
-    stream: wasi::io::streams::OutputStream,
+    stream: wasip2::io::streams::OutputStream,
 }
 
 impl OutputStreamWriter {
-    pub fn new(stream: wasi::io::streams::OutputStream) -> Self {
+    pub fn new(stream: wasip2::io::streams::OutputStream) -> Self {
         Self { stream }
     }
 }

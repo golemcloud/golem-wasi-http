@@ -14,9 +14,9 @@ use std::io::Read;
 use std::net::SocketAddr;
 use url::Url;
 
-use wasi::http::types::IncomingBody;
-use wasi::http::*;
-use wasi::io::streams::InputStream;
+use wasip2::http::types::IncomingBody;
+use wasip2::http::*;
+use wasip2::io::streams::InputStream;
 
 /// A Response to a submitted `Request`.
 #[derive(Debug)]

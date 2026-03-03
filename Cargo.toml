@@ -34,13 +34,13 @@ percent-encoding = "2.1"
 serde = "1.0"
 serde_urlencoded = "0.7.1"
 url = "2.4"
-wasi = "=0.14.1+wasi-0.2.3"
+wasip2 = "1.0.2"
 
 ## async
 async-iterator = { version = "2.3.0", optional = true }
 futures = { version = "0.3.31", optional = true }
 futures-concurrency = { version = "7.6.3", optional = true }
-wstd = { version = "=0.5.4", optional = true }
+wstd = { version = "0.6.5", optional = true }
 
 ## json
 serde_json = { version = "1.0", optional = true }

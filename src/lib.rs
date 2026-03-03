@@ -48,8 +48,8 @@ mod util;
 mod wasi;
 
 pub use self::wasi::{Body, Client, ClientBuilder, Request, RequestBuilder, Response};
-pub use ::wasi::http::types::IncomingBody;
-pub use ::wasi::io::streams::{InputStream, StreamError};
+pub use ::wasip2::http::types::IncomingBody;
+pub use ::wasip2::io::streams::{InputStream, StreamError};
 
 #[cfg(feature = "multipart")]
 pub use self::wasi::multipart;
