@@ -168,20 +168,14 @@ impl Client {
         let body = custom.body.take();
 
         if let Some(body) = body {
-            let is_buffered_body = body.as_bytes().is_some();
             let body_writer = custom.init_request_body()?;
             custom.send_request()?;
 
             let send_body = body_writer.send_body(body)?;
+            let receive_response_future = custom.receive_response();
 
-            if is_buffered_body {
-                send_body.await?;
-                custom.receive_response().await
-            } else {
-                let receive_response_future = custom.receive_response();
-                let (incoming_response, _) = (receive_response_future, send_body).join().await;
-                incoming_response
-            }
+            let (incoming_response, _) = (receive_response_future, send_body).join().await;
+            incoming_response
         } else {
             custom.send_request()?;
             let response = custom.receive_response().await?;
